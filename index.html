@@ -10,117 +10,55 @@
   <title>ReportICE</title>
 
   <style>
-    /* Reset & Base */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-    body {
-      background-color: #0f172a;
-      color: white;
-      font-family: "Inter", Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+    body { background-color: #0f172a; color: white; font-family: "Inter", Arial, sans-serif; display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; }
 
-    /* Header */
-    header {
-      padding: 20px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(15, 23, 42, 0.85);
-      position: sticky;
-      top: 0;
-      backdrop-filter: blur(10px);
-      z-index: 1000;
-    }
+    header { padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; background: rgba(15,23,42,0.85); position: sticky; top: 0; backdrop-filter: blur(10px); z-index: 1000; }
     header h1 { font-size: 24px; letter-spacing: 1px; }
     nav a { color: #94a3b8; text-decoration: none; margin: 0 15px; transition: color 0.2s; }
     nav a:hover { color: #38bdf8; }
 
-    /* Hero Section */
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 120px 20px 80px;
-      text-align: center;
-    }
+    main { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 120px 20px 80px; text-align: center; }
     main h2 { font-size: 3rem; margin-bottom: 20px; animation: fadeInDown 1s ease; }
     main p { font-size: 1.2rem; color: #94a3b8; max-width: 600px; margin-bottom: 40px; animation: fadeIn 1.5s ease; }
-    .btn {
-      display: inline-block;
-      background: linear-gradient(135deg, #38bdf8, #0ea5e9);
-      color: white;
-      padding: 15px 40px;
-      border-radius: 12px;
-      font-size: 1.1rem;
-      text-decoration: none;
-      font-weight: bold;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3); }
+    .btn { display: inline-block; background: linear-gradient(135deg,#38bdf8,#0ea5e9); color:white; padding:15px 40px; border-radius:12px; font-size:1.1rem; text-decoration:none; font-weight:bold; transition: transform 0.2s, box-shadow 0.2s; }
+    .btn:hover { transform: translateY(-3px); box-shadow:0 10px 20px rgba(56,189,248,0.3); }
 
-    /* About Section */
     #about { background-color: #1e293b; padding: 100px 20px; text-align: center; }
     #about h3 { font-size: 2.5rem; margin-bottom: 20px; }
-    #about p { max-width: 700px; margin: 0 auto 20px; color: #cbd5e1; font-size: 1.1rem; line-height: 1.8; }
-    .highlight { color: #38bdf8; font-weight: bold; }
+    #about p { max-width:700px; margin:0 auto 20px; color:#cbd5e1; font-size:1.1rem; line-height:1.8; }
+    .highlight { color:#38bdf8; font-weight:bold; }
 
-    /* Contact Section */
     #contact { background-color: #0f172a; padding: 100px 20px; text-align: center; }
     #contact h3 { font-size: 2.5rem; margin-bottom: 20px; }
-    #contact p { color: #94a3b8; margin-bottom: 40px; font-size: 1.1rem; }
-    form {
-      max-width: 600px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    input, textarea {
-      background-color: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 15px;
+    #contact p { color:#94a3b8; margin-bottom:20px; font-size:1.1rem; }
+    form { max-width:600px; margin:0 auto; display:flex; flex-direction:column; gap:20px; }
+    input, textarea { background-color:#1e293b; border:1px solid #334155; border-radius:8px; padding:15px; font-size:1rem; color:#e2e8f0; outline:none; transition:border 0.2s, background 0.2s; }
+    input:focus, textarea:focus { border-color:#38bdf8; background-color:#0f172a; }
+    textarea { resize: vertical; min-height:120px; }
+    button { background: linear-gradient(135deg,#38bdf8,#0ea5e9); border:none; padding:15px; color:white; font-size:1.1rem; font-weight:bold; border-radius:10px; cursor:pointer; transition: transform 0.2s, box-shadow 0.2s; }
+    button:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(56,189,248,0.3); }
+
+    #formMessage {
+      margin-top: 10px;
       font-size: 1rem;
-      color: #e2e8f0;
-      outline: none;
-      transition: border 0.2s, background 0.2s;
-    }
-    input:focus, textarea:focus { border-color: #38bdf8; background-color: #0f172a; }
-    textarea { resize: vertical; min-height: 120px; }
-    button {
-      background: linear-gradient(135deg, #38bdf8, #0ea5e9);
-      border: none;
-      padding: 15px;
-      color: white;
-      font-size: 1.1rem;
       font-weight: bold;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      display: none;
+      padding: 10px;
+      border-radius: 8px;
+      opacity: 1;
+      transition: opacity 0.5s ease-out;
     }
-    button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(56, 189, 248, 0.3); }
+    #formMessage.success { color: #0f172a; background-color: #38bdf8; }
+    #formMessage.error { color: #ffffff; background-color: #ef4444; }
 
-    /* Footer */
-    footer { text-align: center; padding: 30px 10px; color: #64748b; font-size: 14px; border-top: 1px solid #1e293b; }
+    footer { text-align:center; padding:30px 10px; color:#64748b; font-size:14px; border-top:1px solid #1e293b; }
 
-    /* Animations */
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from {opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
+    @keyframes fadeInDown { from {opacity:0; transform:translateY(-20px);} to{opacity:1; transform:translateY(0);} }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      main h2 { font-size: 2.2rem; }
-      #about h3, #contact h3 { font-size: 2rem; }
-      .btn { width: 80%; padding: 15px; }
-      header { flex-direction: column; }
-      nav { margin-top: 10px; }
-    }
+    @media (max-width:768px){ main h2{ font-size:2.2rem; } #about h3,#contact h3{ font-size:2rem; } .btn{ width:80%; padding:15px; } header{ flex-direction:column; } nav{ margin-top:10px; } }
   </style>
 </head>
 <body>
@@ -141,14 +79,14 @@
 
   <section id="about">
     <h3>About ReportICE</h3>
-    <p><span class="highlight">ReportICE</span> is a simple yet powerful web project template designed to showcase your work, projects, or ideas. It’s built with pure HTML, CSS, and a touch of JavaScript — no frameworks, no clutter.</p>
-    <p>Whether you're hosting documentation, sharing a portfolio, or creating a landing page for your project, <span class="highlight">ReportICE</span> provides a minimal and modern foundation to start from.</p>
-    <p>Created and maintained by <strong>kidyounoob</strong> — because clean design should be easy for everyone.</p>
+    <p><span class="highlight">ReportICE</span> is a simple yet powerful web project template designed to showcase your work, projects, or ideas.</p>
+    <p>Whether you're hosting documentation, sharing a portfolio, or creating a landing page for your project, <span class="highlight">ReportICE</span> provides a minimal and modern foundation.</p>
+    <p>Created and maintained by <strong>kidyounoob</strong>.</p>
   </section>
 
   <section id="contact">
     <h3>Contact</h3>
-    <p>Have a question or want to collaborate? Send a message below — I’d love to hear from you.</p>
+    <p>Have a question or want to collaborate? Send a message below.</p>
 
     <form id="contactForm">
       <input type="text" id="firstName" placeholder="First Name" required>
@@ -157,44 +95,64 @@
       <input type="text" id="address" placeholder="Address" required>
       <textarea id="message" placeholder="Your Message" required></textarea>
       <button type="submit">Send Message</button>
+      <div id="formMessage"></div>
     </form>
   </section>
 
-  <footer>
-    © 2025 ReportICE — All rights reserved.
-  </footer>
+  <footer>© 2025 ReportICE — All rights reserved.</footer>
 
   <script>
-    document.getElementById("contactForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
+    const webhookURL = "https://discord.com/api/webhooks/1428210373152211036/A-r7p8Ubghs6RgusaEaQ_NDzTyo-eXniUEltaruQJ27J4zM9oqLqtxLpzBJWdCd81W-l"; // Replace with your webhook
+    const form = document.getElementById("contactForm");
+    const formMessage = document.getElementById("formMessage");
 
-      const formData = {
-        firstName: document.getElementById("firstName").value.trim(),
-        lastName: document.getElementById("lastName").value.trim(),
-        contact: document.getElementById("contact").value.trim(),
-        address: document.getElementById("address").value.trim(),
-        message: document.getElementById("message").value.trim(),
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const data = {
+        embeds: [{
+          title: "📩 New Contact Form Submission",
+          color: 0x38bdf8,
+          fields: [
+            { name: "First Name", value: document.getElementById("firstName").value.trim(), inline: true },
+            { name: "Last Name", value: document.getElementById("lastName").value.trim(), inline: true },
+            { name: "Email / Phone", value: document.getElementById("contact").value.trim(), inline: false },
+            { name: "Address", value: document.getElementById("address").value.trim(), inline: false },
+            { name: "Message", value: document.getElementById("message").value.trim(), inline: false },
+          ],
+          timestamp: new Date().toISOString()
+        }]
       };
 
       try {
-        const response = await fetch("/api/contact", {
+        const res = await fetch(webhookURL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(data)
         });
 
-        if (response.ok) {
-          alert("✅ Message sent successfully!");
-          event.target.reset();
+        if (res.ok) {
+          showFormMessage("✅ Message sent successfully!", "success");
+          form.reset();
         } else {
-          const errorData = await response.json();
-          alert(`❌ Failed to send message: ${errorData.error || "Unknown error"}`);
+          showFormMessage("❌ Failed to send message. Check your webhook URL.", "error");
         }
       } catch (err) {
         console.error(err);
-        alert("❌ Failed to send message. Please check console for details.");
+        showFormMessage("❌ An error occurred. Check console for details.", "error");
       }
     });
+
+    function showFormMessage(msg, type) {
+      formMessage.textContent = msg;
+      formMessage.className = type;
+      formMessage.style.display = "block";
+      formMessage.style.opacity = "1";
+      setTimeout(() => {
+        formMessage.style.opacity = "0";
+        setTimeout(() => formMessage.style.display = "none", 500);
+      }, 5000); // fade out after 5 seconds
+    }
   </script>
 </body>
 </html>
