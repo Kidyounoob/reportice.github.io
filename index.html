@@ -151,8 +151,10 @@
     <p>Have a question or want to collaborate? Send a message below — I’d love to hear from you.</p>
 
     <form id="contactForm">
-      <input type="text" id="name" placeholder="Your Name" required>
-      <input type="email" id="email" placeholder="Your Email" required>
+      <input type="text" id="firstName" placeholder="First Name" required>
+      <input type="text" id="lastName" placeholder="Last Name" required>
+      <input type="text" id="contact" placeholder="Email or Phone" required>
+      <input type="text" id="address" placeholder="Address" required>
       <textarea id="message" placeholder="Your Message" required></textarea>
       <button type="submit">Send Message</button>
     </form>
@@ -174,19 +176,17 @@
         message: document.getElementById("message").value.trim(),
       };
 
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      try {
+        const response = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
 
-      if (response.ok) {
-        alert("✅ Message sent successfully!");
-        event.target.reset();
-      } else {
-        alert("❌ Failed to send message. Please try again later.");
-      }
-    });
-  </script>
-</body>
-</html>
+        if (response.ok) {
+          alert("✅ Message sent successfully!");
+          event.target.reset();
+        } else {
+          const errorData = await response.json();
+          alert(`❌ Failed to send message: ${errorData.error || "Unknown error"}`);
+       
