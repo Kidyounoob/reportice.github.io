@@ -1,57 +1,40 @@
-// server.js
 import express from "express";
+import fetch from "node-fetch";
 import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
 
 dotenv.config();
 const app = express();
-
-// Fix __dirname for ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Middleware
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public"))); // Serve index.html
 
-// Test route
-app.get("/test", (req, res) => {
-  res.send("✅ Server is running!");
-});
-
-// Contact form route
 app.post("/api/contact", async (req, res) => {
   const { firstName, lastName, contact, address, message } = req.body;
 
-  // Check for missing fields
-  if ([firstName, lastName, contact, address, message].some(f => !f || !f.trim())) {
+  if (!firstName || !lastName || !contact || !address || !message) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  if (!webhookUrl) {
+    console.error("❌ DISCORD_WEBHOOK_URL not set in .env");
+    return res.status(500).json({ error: "Webhook URL not configured" });
+  }
+
   const discordPayload = {
-    content: `📩 **New Contact Form Submission**`,
     embeds: [
       {
-        title: "Contact Form Details",
+        title: "📩 New Contact Form Submission",
         color: 0x38bdf8,
         fields: [
-          { name: "First Name", value: firstName.trim(), inline: true },
-          { name: "Last Name", value: lastName.trim(), inline: true },
-          { name: "Email / Phone", value: contact.trim(), inline: false },
-          { name: "Address", value: address.trim(), inline: false },
-          { name: "Message", value: message.trim(), inline: false },
+          { name: "First Name", value: firstName, inline: true },
+          { name: "Last Name", value: lastName, inline: true },
+          { name: "Email / Phone", value: contact, inline: false },
+          { name: "Address", value: address, inline: false },
+          { name: "Message", value: message, inline: false },
         ],
         timestamp: new Date().toISOString(),
       },
     ],
   };
-
-  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
-  if (!webhookUrl) {
-    console.error("❌ Discord webhook URL not set in .env");
-    return res.status(500).json({ error: "Server misconfigured" });
-  }
 
   try {
     const response = await fetch(webhookUrl, {
@@ -60,20 +43,18 @@ app.post("/api/contact", async (req, res) => {
       body: JSON.stringify(discordPayload),
     });
 
-    const text = await response.text();
     if (!response.ok) {
-      console.error("Discord webhook failed:", text);
-      return res.status(500).json({ error: "Failed to send message", discordResponse: text });
+      const text = await response.text();
+      console.error("Discord webhook failed:", response.status, text);
+      throw new Error("Discord webhook failed");
     }
 
-    console.log("✅ Message sent to Discord:", text);
     res.status(200).json({ success: true });
   } catch (err) {
-    console.error("Error sending to Discord:", err);
-    res.status(500).json({ error: "Failed to send message", details: err.message });
+    console.error(err);
+    res.status(500).json({ error: "Failed to send message" });
   }
 });
 
-// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
