@@ -49,3 +49,10 @@ app.post("/api/contact", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+fetch(process.env.DISCORD_WEBHOOK_URL, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ content: "Test message from backend" }),
+})
+  .then(res => console.log("Test webhook status:", res.status))
+  .catch(err => console.error("Webhook test error:", err));
