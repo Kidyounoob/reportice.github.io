@@ -35,7 +35,7 @@
       color: white;
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 0;
+      padding: 100px 20px;
       font-family: "Inter", Arial, sans-serif;
       display: flex;
       flex-direction: column;
@@ -59,6 +59,10 @@
       font-size: 24px;
       letter-spacing: 1px;
     }
+    p {
+      font-size: 20px;
+    }
+
     nav a {
       color: #94a3b8;
       text-decoration: none;
@@ -78,15 +82,11 @@
       align-items: center;
       padding: 120px 20px 80px;
       text-align: center;
-      background: linear-gradient(135deg, #1e293b, #0f172a);
-      border-bottom: 2px solid #38bdf8;
     }
 
     main h2 {
       font-size: 3rem;
       margin-bottom: 20px;
-      animation: fadeInDown 1s ease;
-      color: #38bdf8;
     }
 
     main p {
@@ -94,7 +94,6 @@
       color: #94a3b8;
       max-width: 600px;
       margin-bottom: 40px;
-      animation: fadeIn 1.5s ease;
     }
 
     .btn {
@@ -112,31 +111,6 @@
     .btn:hover {
       transform: translateY(-3px);
       box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3);
-    }
-
-    /* About Section */
-    #about {
-      background-color: #1e293b;
-      padding: 100px 20px;
-      text-align: center;
-    }
-
-    #about h3 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-    }
-
-    #about p {
-      max-width: 700px;
-      margin: 0 auto 20px;
-      color: #cbd5e1;
-      font-size: 1.1rem;
-      line-height: 1.8;
-    }
-
-    .highlight {
-      color: #38bdf8;
-      font-weight: bold;
     }
 
     /* Contact Section */
@@ -212,40 +186,14 @@
       font-size: 14px;
       border-top: 1px solid #1e293b;
     }
-
-    /* Animations */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      main h2 {
-        font-size: 2.2rem;
-      }
-      #about h3, #contact h3 {
-        font-size: 2rem;
-      }
-      .btn {
-        width: 80%;
-        padding: 15px;
-      }
-      header {
-        flex-direction: column;
-      }
-      nav {
-        margin-top: 10px;
-      }
-    }
   </style>
 </head>
 <body>
+  <h1>Welcome to ReportICE</h1>
+  <p>This is a sample project site created by <strong>kidyounoob</strong>.</p>
+  <p>Check out more on my <a href="https://github.com/kidyounoob">GitHub</a>.</p>
+  <footer>© 2025 ReportICE</footer>
+  
   <header>
     <h1>ReportICE</h1>
     <nav>
@@ -261,21 +209,16 @@
     <a href="https://github.com/kidyounoob" class="btn" target="_blank" rel="noopener noreferrer">View on GitHub</a>
   </main>
 
-  <section id="about">
-    <h3>About ReportICE</h3>
-    <p><span class="highlight">ReportICE</span> is a simple yet powerful web project template designed to showcase your work, projects, or ideas. It’s built with pure HTML, CSS, and a touch of JavaScript — no frameworks, no clutter.</p>
-    <p>Whether you're hosting documentation, sharing a portfolio, or creating a landing page for your project, <span class="highlight">ReportICE</span> provides a minimal and modern foundation to start from.</p>
-    <p>Created and maintained by <strong>kidyounoob</strong> — because clean design should be easy for everyone.</p>
-  </section>
-
   <section id="contact">
     <h3>Contact</h3>
     <p>Have a question or want to collaborate? Send a message below — I’d love to hear from you.</p>
 
-    <form onsubmit="return handleSubmit(event)">
-      <input type="text" id="name" placeholder="Your Name" required>
-      <input type="email" id="email" placeholder="Your Email" required>
-      <textarea id="message" placeholder="Your Message" required></textarea>
+    <form id="contactForm">
+      <input type="text" id="firstName" name="firstName" placeholder="Your First Name" required>
+      <input type="text" id="lastName" name="lastName" placeholder="Your Last Name" required>
+      <input type="email" id="contact" name="contact" placeholder="Your Email or Phone" required>
+      <input type="text" id="address" name="address" placeholder="Your Address">
+      <textarea id="message" name="message" placeholder="Your Message" required></textarea>
       <button type="submit">Send Message</button>
     </form>
   </section>
@@ -285,12 +228,38 @@
   </footer>
 
   <script>
-    function handleSubmit(event) {
+    document.getElementById('contactForm').addEventListener('submit', async function (event) {
       event.preventDefault();
-      alert("Thank you! Your message has been sent (demo only).");
-      event.target.reset();
-      return false;
-    }
+
+      const formData = {
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        contact: document.getElementById('contact').value,
+        address: document.getElementById('address').value,
+        message: document.getElementById('message').value
+      };
+
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+          alert('Your message has been sent successfully!');
+          document.getElementById('contactForm').reset(); // Reset form fields after submission
+        } else {
+          throw new Error(result.error || 'Something went wrong');
+        }
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    });
   </script>
 </body>
 </html>
