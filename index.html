@@ -189,4 +189,12 @@
         } else {
           const errorData = await response.json();
           alert(`❌ Failed to send message: ${errorData.error || "Unknown error"}`);
-       
+        }
+      } catch (err) {
+        console.error(err);
+        alert("❌ Failed to send message. Please check console for details.");
+      }
+    });
+  </script>
+</body>
+</html>
