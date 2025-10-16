@@ -33,7 +33,6 @@
       font-size: 14px;
     }
 
-    /* Contact form styling */
     .contact-section {
       margin-top: 60px;
       background-color: #1e293b;
@@ -93,18 +92,23 @@
   <p>This is a sample site created by <strong>kidyounoob</strong>.</p>
   <p>Check out more on my <a href="https://github.com/kidyounoob">GitHub</a>.</p>
 
-  <!-- Contact form -->
   <div class="contact-section">
     <h2>Contact Us</h2>
     <form id="contactForm">
-      <label for="name">Your Name</label>
-      <input type="text" id="name" name="name" required>
+      <label for="firstName">First Name</label>
+      <input type="text" id="firstName" name="firstName" required>
 
-      <label for="email">Your Email</label>
-      <input type="email" id="email" name="email" required>
+      <label for="lastName">Last Name</label>
+      <input type="text" id="lastName" name="lastName" required>
+
+      <label for="contact">Email or Phone Number</label>
+      <input type="text" id="contact" name="contact" placeholder="you@example.com or +1 555-555-5555" required>
+
+      <label for="address">Address</label>
+      <input type="text" id="address" name="address" placeholder="123 Main St, City, State" required>
 
       <label for="message">Message</label>
-      <textarea id="message" name="message" required></textarea>
+      <textarea id="message" name="message" placeholder="Your message here..." required></textarea>
 
       <button type="submit">Send Message</button>
     </form>
@@ -116,14 +120,78 @@
     document.getElementById("contactForm").addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const message = document.getElementById("message").value.trim();
+      const formData = {
+        firstName: document.getElementById("firstName").value.trim(),
+        lastName: document.getElementById("lastName").value.trim(),
+        contact: document.getElementById("contact").value.trim(),
+        address: document.getElementById("address").value.trim(),
+        message: document.getElementById("message").value.trim(),
+      };
 
-      // For now, just show an alert — you can connect this to a backend or Discord later
-      alert(`Thanks ${name}! Your message has been received.`);
-      event.target.reset();
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        alert("✅ Message sent successfully!");
+        event.target.reset();
+      } else {
+        alert("❌ Failed to send message. Please try again later.");
+      }
     });
   </script>
 </body>
 </html>
+import express from "express";
+import fetch from "node-fetch";
+import dotenv from "dotenv";
+
+dotenv.config();
+const app = express();
+app.use(express.json());
+
+app.post("/api/contact", async (req, res) => {
+  const { firstName, lastName, contact, address, message } = req.body;
+
+  if (!firstName || !lastName || !contact || !address || !message) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  const discordPayload = {
+    embeds: [
+      {
+        title: "📩 New Contact Form Submission",
+        color: 0x38bdf8,
+        fields: [
+          { name: "First Name", value: firstName, inline: true },
+          { name: "Last Name", value: lastName, inline: true },
+          { name: "Email / Phone", value: contact, inline: false },
+          { name: "Address", value: address, inline: false },
+          { name: "Message", value: message },
+        ],
+        timestamp: new Date().toISOString(),
+      },
+    ],
+  };
+
+  try {
+    const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(discordPayload),
+    });
+
+    if (!response.ok) throw new Error("Discord webhook failed");
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to send message" });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
