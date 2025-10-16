@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ReportICE — Send to Discord</title>
+  <style>
+    body {
+      background:#0f172a;color:#fff;font-family:Arial,Helvetica,sans-serif;
+      display:flex;align-items:center;justify-content:center;height:100vh;margin:0;
+    }
+    .card {background:#071033;padding:28px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.5);width:100%;max-width:640px;}
+    h1{margin:0 0 8px;font-size:28px}
+    label{display:block;margin:12px 0 6px;font-size:13px;color:#9fb0d6}
+    input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #22324a;background:#081426;color:#e6eefb;font-size:14px}
+    textarea{min-height:120px;resize:vertical}
+    button{margin-top:14px;padding:10px 16px;border-radius:8px;border:0;background:#38bdf8;color:#052029;font-weight:700;cursor:pointer}
+    small {display:block;margin-top:10px;color:#93a7c8}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>ReportICE — Submit Info</h1>
+
+    <form id="discord-form">
+      <label for="name">Name (optional)</label>
+      <input id="name" name="name" placeholder="Name or handle">
+
+      <label for="msg">Message</label>
+      <textarea id="msg" name="message" required placeholder="Type your message here..."></textarea>
+
+      <label>
+        <input type="checkbox" id="consent" required>
+        <span style="color:#9fb0d6"> I consent to this message being posted in the Discord channel. Do not share sensitive personal data.</span>
+      </label>
+
+      <button type="submit">Send to Discord</button>
+      <small>By submitting you consent to post the message publicly in the linked Discord channel. Do not include passwords, SSNs, or other sensitive info.</small>
+    </form>
+  </div>
+
+  <script>
+    // === INSERT YOUR WEBHOOK URL BELOW ===
+    const DISCORD_WEBHOOK = "https://discordapp.com/api/webhooks/1428210373152211036/A-r7p8Ubghs6RgusaEaQ_NDzTyo-eXniUEltaruQJ27J4zM9oqLqtxLpzBJWdCd81W-l";
+    // =====================================
+
+    document.getElementById('discord-form').addEventListener('submit', async function(e){
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim() || "Anonymous";
+      const message = document.getElementById('msg').value.trim();
+      const consent = document.getElementById('consent').checked;
+      if(!consent){ alert('Please consent to posting.'); return; }
+      if(!message){ alert('Please enter a message.'); return; }
+
+      // Build a simple, safe content message. Keep length modest.
+      const content = `**${escapeForDiscord(name)}**\n${escapeForDiscord(message)}`;
+
+      try {
+        const res = await fetch(DISCORD_WEBHOOK, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content })
+        });
+
+        if (res.ok) {
+          alert('Message sent — check the Discord channel.');
+          e.target.reset();
+        } else {
+          // Discord returns useful status codes; show a small message
+          const text = await res.text().catch(()=>res.statusText);
+          alert('Failed to send (server returned ' + res.status + ').');
+          console.error('Discord response:', res.status, text);
+        }
+      } catch(err) {
+        alert('Network error: ' + err.message);
+        console.error(err);
+      }
+    });
+
+    // Minimal sanitizer: removes backticks to avoid code-block/mentions abuse
+    function escapeForDiscord(s){
+      return s.replace(/`/g, "'").replace(/@/g, "(at)").slice(0, 1900);
+    }
+  </script>
+</body>
+</html>
